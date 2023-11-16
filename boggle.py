@@ -7,12 +7,13 @@ import string
 class Boggle():
 
     def __init__(self):
-
+        # This method is called when a new instance of the Boggle class is created.
+        # It initializes the instance with a list of words read from a file.
         self.words = self.read_dict("words.txt")
 
     def read_dict(self, dict_path):
         """Read and return all words in dictionary."""
-
+        # This method reads a file containing a list of words and returns a list of those words.
         dict_file = open(dict_path)
         words = [w.strip() for w in dict_file]
         dict_file.close()
@@ -20,7 +21,7 @@ class Boggle():
 
     def make_board(self):
         """Make and return a random boggle board."""
-
+        # This method creates a 5x5 boggle board by randomly selecting letters from the alphabet.
         board = []
 
         for y in range(5):
@@ -31,7 +32,9 @@ class Boggle():
 
     def check_valid_word(self, board, word):
         """Check if a word is a valid word in the dictionary and/or the boggle board"""
-
+        # This method checks if a given word is a valid word in the dictionary and/or the boggle board.
+        # It returns "ok" if the word is valid in both, "not-on-board" if the word is not on the board but is in the dictionary,
+        # and "not-word" if the word is not in the dictionary.
         word_exists = word in self.words
         valid_word = self.find(board, word.upper())
 
@@ -46,25 +49,20 @@ class Boggle():
 
     def find_from(self, board, word, y, x, seen):
         """Can we find a word on board, starting at x, y?"""
-
+        # This method is called recursively to find a word on the board starting at a given x, y position.
+        # It returns True if the word is found and False otherwise.
         if x > 4 or y > 4:
             return
 
-        # This is called recursively to find smaller and smaller words
-        # until all tries are exhausted or until success.
-
         # Base case: this isn't the letter we're looking for.
-
         if board[y][x] != word[0]:
             return False
 
         # Base case: we've used this letter before in this current path
-
         if (y, x) in seen:
             return False
 
         # Base case: we are down to the last letter --- so we win!
-
         if len(word) == 1:
             return True
 
@@ -87,11 +85,9 @@ class Boggle():
         # (this could be written with an augmented operator as "seen |= {(y, x)}",
         # in the same way "x = x + 2" can be written as "x += 2", but that would seem
         # harder to understand).
-
         seen = seen | {(y, x)}
 
         # adding diagonals
-
         if y > 0:
             if self.find_from(board, word[1:], y - 1, x, seen):
                 return True
@@ -124,16 +120,14 @@ class Boggle():
         if x < 4 and y > 0:
             if self.find_from(board, word[1:], y - 1, x + 1, seen):
                 return True
-        # Couldn't find the next letter, so this path is dead
 
+        # Couldn't find the next letter, so this path is dead
         return False
 
     def find(self, board, word):
         """Can word be found in board?"""
-
-        # Find starting letter --- try every spot on board and,
-        # win fast, should we find the word at that place.
-
+        # This method checks if a given word can be found on the board.
+        # It calls the find_from method for each position on the board and returns True if the word is found and False otherwise.
         for y in range(0, 5):
             for x in range(0, 5):
                 if self.find_from(board, word, y, x, seen=set()):
@@ -141,5 +135,4 @@ class Boggle():
 
         # We've tried every path from every starting square w/o luck.
         # Sad panda.
-
         return False
